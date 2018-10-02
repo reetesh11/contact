@@ -46,18 +46,16 @@ def contacts(request):
         for contact in contacts:
             contact_list.append({'name': contact.name,
                                 'email': contact.email})
-        message = json.dumps({'contacts': contact_list})
+        message = json.dumps(contact_list)
 
     elif request.method == 'POST':
         """
         Handle post request. This is to create a new contact.
         Email and name is compulsory to create any record.
         """
-
         status_code = 201
         required_params = ['email', 'name']
-        data = json.loads(request.body)
-
+        data = json.loads(request.body) if request.body else {}
         try:
             validate_request(data, required_params)
             if Contacts.objects.filter(email=data['email']):
@@ -80,8 +78,7 @@ def contacts(request):
 
         status_code = 201
         required_params = ['email']
-        data = json.loads(request.body)
-
+        data = json.loads(request.body) if request.body else {}
         try:
             validate_request(data, required_params)
             contact = Contacts.objects.get(email=data['email'])
@@ -112,7 +109,7 @@ def contacts(request):
         """
 
         status_code = 200
-        data = json.loads(request.body)
+        data = json.loads(request.body) if request.body else {}
         try:
             validate_request(data, ['email'])
             contact = Contacts.objects.get(email=data['email'])
@@ -142,12 +139,11 @@ def search(request):
         name = request.GET.get('name', '')
         email = request.GET.get('email', '')
         page = request.GET.get('page', 1)
-
         #filter out the required data
         if name:
-            contact_list.filter(name=name)
+            contact_list = contact_list.filter(name__contains=name)
         if email:
-            contact_list.filter(email=email)
+            contact_list = contact_list.filter(email__contains=email)
 
         paginator = Paginator(contact_list, 10)
 
@@ -164,7 +160,7 @@ def search(request):
         for contact in contacts:
             contact_list.append({'name': contact.name,
                                 'email': contact.email})
-        message = json.dumps({'contacts': contact_list})
+        message = json.dumps(contact_list)
     else:
         status_code = 405
         message = 'Method not allowed'
