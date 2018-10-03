@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from .models import Contacts
 
 
@@ -62,6 +62,9 @@ def contacts(request):
                 raise BadRequest('%s email is already registered.Please try a different one.' %data['email'])
             contact = Contacts.objects.create(name=data['name'], email=data['email'])
             message = 'New contact created for %s' %data['name']
+        except ValidationError as error:
+            status_code = 400
+            message = error.message
         except BadRequest as error:
             status_code = 400
             message = error.message
@@ -92,6 +95,9 @@ def contacts(request):
                 contact.name = data['new_name']
             contact.save()
             message = "Contact updated for %s email" %data['email']
+        except ValidationError as error:
+            status_code = 400
+            message = error.message
         except ObjectDoesNotExist as error:
             status_code = 400
             message = "%s email does not exists" %data['email']
