@@ -15,4 +15,4 @@ class Contacts(models.Model):
         self.email = self.email.lower().strip()
         if self.email != "":
             validate_email(self.email)
-        super(Contact, self).save(*args, **kwargs)
+        super(Contacts, self).save(*args, **kwargs)
