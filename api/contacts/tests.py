@@ -61,6 +61,15 @@ class PostContactViewTest(ContactViewTest):
         self.assertEqual(response.status_code, 400)
 
 
+    def test_invalid_email(self):
+        response = self.client.post(
+                reverse('contacts'), 
+                json.dumps({'email': 'ganesh', 'name': 'ganesh'}),
+                content_type='application/json'
+                )
+        self.assertEqual(response.status_code, 400)
+
+
     def test_already_present(self):
         response = self.client.post(
                 reverse('contacts'),
